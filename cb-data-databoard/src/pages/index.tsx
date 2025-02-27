@@ -1,7 +1,8 @@
 import Head from "next/head";
 import styles from "@/styles/Home.module.css";
-import Dashboard from "./dashboard";
-import Login from "./login";
+import Dashboard from "@/pages/dashboard";
+import SideMenu from "@/components/sideMenu";
+import Header from "@/components/header";
 
 export default function Home() {
   return (
@@ -13,8 +14,9 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
+        <Header />
+        <SideMenu />
         <Dashboard />
-        <Login />
       </main>
     </>
   );
