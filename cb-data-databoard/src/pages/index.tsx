@@ -3,9 +3,11 @@ import styles from "@/styles/Home.module.css";
 import Dashboard from "@/pages/dashboard";
 import SideMenu from "@/components/SideMenu";
 import Header from "@/components/Header";
+import { useSession } from "next-auth/react";
 import Login from "@/components/Login/Login";
 
 export default function Home() {
+  const { data: session } = useSession();
   return (
     <>
       <Head>
@@ -16,9 +18,13 @@ export default function Home() {
       </Head>
       <main className={styles.main}>
         <Header />
-        <SideMenu />
-        <Dashboard />
-        <Login />
+        {session && (
+          <>
+            <SideMenu />
+            <Dashboard />
+          </>
+        )}
+        <Login/>
       </main>
     </>
   );
