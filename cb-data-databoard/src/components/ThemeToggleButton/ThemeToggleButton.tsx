@@ -5,6 +5,7 @@ import React from "react";
 import { useTheme } from "@mui/system";
 import Typography from "@mui/material/Typography";
 import { useMediaQuery } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 
 export type ThemeToggleButtonProps = {
   ColorModeContext: React.Context<{ toggleColorMode: () => void }>;
@@ -19,7 +20,7 @@ const ThemeToggleButton = (props: ThemeToggleButtonProps) => {
   const colorMode = React.useContext(ColorModeContext);
 
   return (
-    <>
+    <Tooltip title="Switch theme">
       <IconButton
         sx={{
           mr: 2,
@@ -29,7 +30,8 @@ const ThemeToggleButton = (props: ThemeToggleButtonProps) => {
           borderRadius: "8px", // bordas arredondadas
           padding: "6px 12px", // ajusta o padding para um formato mais retangular
           ":hover": {
-            backgroundColor: theme.palette.mode === "dark" ? "#424242" : "#f0f0f0", // cor de fundo de hover
+            backgroundColor:
+              theme.palette.mode === "dark" ? "#424242" : "#f0f0f0", // cor de fundo de hover
           },
         }}
         title={theme.palette.mode + " mode"}
@@ -48,7 +50,7 @@ const ThemeToggleButton = (props: ThemeToggleButtonProps) => {
           </Typography>
         )}
       </IconButton>
-    </>
+    </Tooltip>
   );
 };
 

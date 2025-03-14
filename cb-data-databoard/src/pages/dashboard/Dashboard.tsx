@@ -1,32 +1,20 @@
-import React from 'react';
-import { Box, Paper } from "@mui/material";
-import Grid from "@mui/material/Grid";
-import scss from './Dashboard.module.scss';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React from "react";
+import { Box, Paper, Grid2 } from "@mui/material";
+import scss from "./Dashboard.module.scss";
+import DataRibbon from "@/components/Dashboard/DataRibbon";
+//import  from "@/components/Dashboard/DataRibbon";
+//import  from "@/components/Dashboard/DataRibbon";
 
 const Dashboard = () => {
-    return (
-        <Box>
-            <Grid container spacing={2} className={scss.topCardsContainer}>
-                <Grid item xs={4}>
-                    <Paper className={scss.dataCard}>xs=4</Paper>
-                </Grid>
-
-                <Grid item xs={4}>
-                    <Paper className={scss.dataCard}>xs=4</Paper>
-                </Grid>
-
-                <Grid item xs={4}>
-                    <Paper className={scss.dataCard}>xs=4</Paper>
-                </Grid>
-            </Grid>
-
-            <Grid container>
-                <Grid item xs={12} marginY={2}>
-                    <Paper className={scss.dataCard}>xs=12</Paper>
-                </Grid>
-            </Grid>
-        </Box>
-    );
+  return (
+    <Box>
+      {/* Data ribbon - showing numerical stats */}
+      <DataRibbon />
+      {/* TransactionsPerDay - graphs - numerical cards */}
+      {/* Transaction Doughnut Charts Bottom Row - doughnut charts -  */}
+    </Box>
+  );
 };
 
 export default Dashboard;
