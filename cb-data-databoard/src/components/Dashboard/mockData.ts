@@ -1,5 +1,5 @@
 import { months } from "@/helper/Util";
-
+ 
 export const lineChartData = {
   labels: months({ count: 12 }),
   datasets: [
@@ -8,6 +8,13 @@ export const lineChartData = {
       data: [65, 59, 80, 81, 56, 55, 60, 49, 112, 72, 52, 43],
       fill: false,
       borderColor: "rgb(75, 192, 192)",
+      tension: 0.1,
+    },
+    {
+      label: "Teste",
+      data: [25, 59, 70, 71, 26, 55, 60, 49, 122, 72, 72, 47],
+      fill: false,
+      borderColor: "rgb(192, 180, 75)",
       tension: 0.1,
     },
   ],
