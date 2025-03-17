@@ -34,7 +34,6 @@ const ThemeToggleButton = (props: ThemeToggleButtonProps) => {
               theme.palette.mode === "dark" ? "#424242" : "#f0f0f0", // cor de fundo de hover
           },
         }}
-        title={theme.palette.mode + " mode"}
         aria-label={theme.palette.mode + " mode button"}
         onClick={colorMode.toggleColorMode}
         color="inherit"
