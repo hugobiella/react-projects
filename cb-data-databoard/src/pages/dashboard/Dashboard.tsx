@@ -1,22 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
-import { Box } from "@mui/material";
-import DataRibbon from "@/components/Dashboard/DataRibbon";
-import TransactionsPerDay from "@/components/Dashboard/TransactionsPerDay";
-import TransactionBottomRow from "@/components/Dashboard/TransactionBottomRow";
-import { Grid2 } from "@mui/material";
+import Timeline from "@/components/Dashboard";
+import Settings from "./settings";
 
 const Dashboard = () => {
   return (
-    <Box>
-      {/* <Grid2>
-        <DataRibbon />
-      </Grid2> */}
-      <Grid2 marginTop={4}>
-        <TransactionsPerDay />
-      </Grid2>
-      {/* <TransactionBottomRow /> */}
-    </Box>
+    <div style={{alignItems: 'center'}}>
+        <Timeline />
+
+    </div>
   );
 };
 export default Dashboard;

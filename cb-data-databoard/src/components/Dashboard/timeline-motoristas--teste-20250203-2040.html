@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js "></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.min.js "></script>
+</head>
+<body>
+
+<div class="chart-view">
+  <canvas id="chart" width="1350" height="570"></canvas>
+</div>
+
+<script>
+
+// Definindo as bases JSON
+
+// Caminhões
+
+const caminhoes = [
+  { caminhao: "ABC-1234", modelo: "Volvo FH", ano: "2010", descricao: "Caminhão pesado para transporte de longa distância" },
+  { caminhao: "XYZ-5678", modelo: "Mercedes-Benz Actros", ano: "2015", descricao: "Caminhão com alta capacidade de carga e eficiência" },
+  { caminhao: "LMN-4567", modelo: "Scania R450", ano: "2018", descricao: "Modelo avançado com baixo consumo de combustível" },
+  { caminhao: "PQR-8910", modelo: "Iveco Stralis", ano: "2012", descricao: "Caminhão confiável para transporte regional" },
+  { caminhao: "STU-1122", modelo: "MAN TGX", ano: "2020", descricao: "Caminhão moderno com excelente conforto para o motorista" },
+  { caminhao: "VWX-3344", modelo: "DAF XF", ano: "2016", descricao: "Caminhão eficiente para operações logísticas" },
+  { caminhao: "YZA-5566", modelo: "Renault Magnum", ano: "2008", descricao: "Caminhão robusto para transporte pesado" },
+  { caminhao: "BCD-7788", modelo: "Ford Cargo", ano: "2014", descricao: "Caminhão versátil para múltiplas aplicações" },
+  { caminhao: "EFG-9900", modelo: "International ProStar", ano: "2017", descricao: "Caminhão aerodinâmico com excelente desempenho" },
+  { caminhao: "HIJ-3344", modelo: "Kenworth T680", ano: "2019", descricao: "Caminhão premium com tecnologia avançada" }
+];
+
+// Motoristas
+
+const motoristas = [
+  { cpf: "12345678900", nome: "Maria Joana",     dataNascimento: "1985-03-10", cidadeUF: "Trindade-GO",     analista: "Kevin Rocha" },
+  { cpf: "98765432100", nome: "Felipe Souza",    dataNascimento: "1990-06-25", cidadeUF: "Posse-GO",        analista: "Paulo Júnior" },
+  { cpf: "45612378901", nome: "João Silva",      dataNascimento: "1982-08-12", cidadeUF: "Goiânia-GO",      analista: "Kevin Rocha" },
+  { cpf: "78945612302", nome: "Ana Clara",       dataNascimento: "1995-04-20", cidadeUF: "Goiatuba-GO",     analista: "Kevin Rocha" },
+  { cpf: "32165498703", nome: "Pedro Henrique",  dataNascimento: "1988-12-15", cidadeUF: "Luziânia-GO",     analista: "Kevin Rocha" },
+  { cpf: "65478932104", nome: "Larissa Lima",    dataNascimento: "1993-09-08", cidadeUF: "Caldas Novas-GO", analista: "Kevin Rocha" },
+  { cpf: "98732165405", nome: "Rafael Oliveira", dataNascimento: "1986-11-25", cidadeUF: "Mineiros-GO",     analista: "Fernanda Alves" },
+  { cpf: "65412378906", nome: "Camila Santos",   dataNascimento: "1991-02-19", cidadeUF: "Santa Helena-GO", analista: "Fernanda Alves" },
+  { cpf: "12398745607", nome: "Lucas Almeida",   dataNascimento: "1984-07-01", cidadeUF: "Posse-GO",        analista: "Fernanda Alves" },
+  { cpf: "98765412308", nome: "Sofia Costa",     dataNascimento: "1997-05-13", cidadeUF: "Porangatu-GO",    analista: "Fernanda Alves" },
+];
+
+// Eventos de Caminhões: manutenções
+
+const eventosCaminhoes = [
+  { caminhao: "ABC-1234", tipoEvento: "Manutenção Preventiva", dataInicio: "2024-09-05", dataFim: "2024-09-06", local: "Goiânia-GO" },
+  { caminhao: "XYZ-5678", tipoEvento: "Troca de Pneus",        dataInicio: "2024-09-10", dataFim: "2024-09-11", local: "Anápolis-GO" },
+  { caminhao: "LMN-4567", tipoEvento: "Revisão Geral",         dataInicio: "2024-09-15", dataFim: "2024-09-17", local: "Rio Verde-GO" },
+  { caminhao: "PQR-8910", tipoEvento: "Troca de Óleo",         dataInicio: "2024-09-18", dataFim: "2024-09-19", local: "Caldas Novas-GO" },
+  { caminhao: "STU-1122", tipoEvento: "Inspeção de Freios",    dataInicio: "2024-09-20", dataFim: "2024-09-21", local: "Palmas-TO" },
+  { caminhao: "VWX-3344", tipoEvento: "Manutenção Elétrica",   dataInicio: "2024-09-25", dataFim: "2024-09-26", local: "Catalão-GO" },
+  { caminhao: "YZA-5566", tipoEvento: "Troca de Bateria",      dataInicio: "2024-09-28", dataFim: "2024-09-29", local: "Porangatu-GO" },
+  { caminhao: "BCD-7788", tipoEvento: "Revisão de Suspensão",  dataInicio: "2024-09-07", dataFim: "2024-09-08", local: "Luziânia-GO" },
+  { caminhao: "EFG-9900", tipoEvento: "Inspeção Técnica",      dataInicio: "2024-09-12", dataFim: "2024-09-13", local: "Jataí-GO" },
+  { caminhao: "HIJ-3344", tipoEvento: "Manutenção no Motor",   dataInicio: "2024-09-16", dataFim: "2024-09-18", local: "Barreiras-BA" }
+];
+
+// Folgas e Férias
+
+const folgasFerias = [
+  { motorista: "Maria Joana",     tipoAfastamento: "Folga", dataInicio: "2024-09-11T00:00-03:00", dataFim: "2024-09-13T00:00-03:00", local: "Trindade-GO",     analista: "Kevin Rocha" },
+  { motorista: "Maria Joana",     tipoAfastamento: "Folga", dataInicio: "2024-09-25T00:00-03:00", dataFim: "2024-09-27T00:00-03:00", local: "Trindade-GO",     analista: "Kevin Rocha" },
+  { motorista: "Felipe Souza",    tipoAfastamento: "Folga", dataInicio: "2024-09-18T00:00-03:00", dataFim: "2024-09-20T00:00-03:00", local: "Posse-GO",        analista: "Paulo Júnior" },
+  { motorista: "João Silva",      tipoAfastamento: "Folga", dataInicio: "2024-09-11T00:00-03:00", dataFim: "2024-09-13T00:00-03:00", local: "Goiânia-GO",      analista: "Kevin Rocha" },
+  { motorista: "Ana Clara",       tipoAfastamento: "Folga", dataInicio: "2024-09-12T00:00-03:00", dataFim: "2024-09-14T00:00-03:00", local: "Goiatuba-GO",     analista: "Paulo Júnior" },
+  { motorista: "Pedro Henrique",  tipoAfastamento: "Folga", dataInicio: "2024-09-20T00:00-03:00", dataFim: "2024-09-22T00:00-03:00", local: "Luziânia-GO",     analista: "Paulo Júnior" },
+  { motorista: "Larissa Lima",    tipoAfastamento: "Folga", dataInicio: "2024-09-14T00:00-03:00", dataFim: "2024-09-16T00:00-03:00", local: "Caldas Novas-GO", analista: "Paulo Júnior" },
+  { motorista: "Rafael Oliveira", tipoAfastamento: "Folga", dataInicio: "2024-09-13T00:00-03:00", dataFim: "2024-09-15T00:00-03:00", local: "Mineiros-GO",     analista: "Fernanda Alves" },
+  { motorista: "Camila Santos",   tipoAfastamento: "Folga", dataInicio: "2024-09-17T00:00-03:00", dataFim: "2024-09-19T00:00-03:00", local: "Santa Helena-GO", analista: "Fernanda Alves" },
+  { motorista: "Lucas Almeida",   tipoAfastamento: "Folga", dataInicio: "2024-09-27T00:00-03:00", dataFim: "2024-09-29T00:00-03:00", local: "Posse-GO",        analista: "Fernanda Alves" },
+  { motorista: "Sofia Costa",     tipoAfastamento: "Folga", dataInicio: "2024-09-09T00:00-03:00", dataFim: "2024-09-11T00:00-03:00", local: "Porangatu-GO",    analista: "Fernanda Alves" },
+  { motorista: "Maria Joana",     tipoAfastamento: "Folga", dataInicio: "2024-10-11T00:00-03:00", dataFim: "2024-10-13T00:00-03:00", local: "Trindade-GO",     analista: "Kevin Rocha" },
+  { motorista: "Maria Joana",     tipoAfastamento: "Folga", dataInicio: "2024-10-25T00:00-03:00", dataFim: "2024-10-27T00:00-03:00", local: "Trindade-GO",     analista: "Kevin Rocha" },
+  { motorista: "Felipe Souza",    tipoAfastamento: "Folga", dataInicio: "2024-10-18T00:00-03:00", dataFim: "2024-10-20T00:00-03:00", local: "Posse-GO",        analista: "Paulo Júnior" },
+  { motorista: "João Silva",      tipoAfastamento: "Folga", dataInicio: "2024-10-11T00:00-03:00", dataFim: "2024-10-13T00:00-03:00", local: "Goiânia-GO",      analista: "Kevin Rocha" },
+  { motorista: "Ana Clara",       tipoAfastamento: "Folga", dataInicio: "2024-10-12T00:00-03:00", dataFim: "2024-10-14T00:00-03:00", local: "Goiatuba-GO",     analista: "Paulo Júnior" },
+  { motorista: "Pedro Henrique",  tipoAfastamento: "Folga", dataInicio: "2024-10-20T00:00-03:00", dataFim: "2024-10-22T00:00-03:00", local: "Luziânia-GO",     analista: "Paulo Júnior" },
+  { motorista: "Larissa Lima",    tipoAfastamento: "Folga", dataInicio: "2024-10-14T00:00-03:00", dataFim: "2024-10-16T00:00-03:00", local: "Caldas Novas-GO", analista: "Paulo Júnior" },
+  { motorista: "Rafael Oliveira", tipoAfastamento: "Folga", dataInicio: "2024-10-13T00:00-03:00", dataFim: "2024-10-15T00:00-03:00", local: "Mineiros-GO",     analista: "Fernanda Alves" },
+  { motorista: "Camila Santos",   tipoAfastamento: "Folga", dataInicio: "2024-10-17T00:00-03:00", dataFim: "2024-10-19T00:00-03:00", local: "Santa Helena-GO", analista: "Fernanda Alves" },
+  { motorista: "Lucas Almeida",   tipoAfastamento: "Folga", dataInicio: "2024-10-27T00:00-03:00", dataFim: "2024-10-29T00:00-03:00", local: "Posse-GO",        analista: "Fernanda Alves" },
+  { motorista: "Sofia Costa",     tipoAfastamento: "Folga", dataInicio: "2024-10-09T00:00-03:00", dataFim: "2024-10-11T00:00-03:00", local: "Porangatu-GO",    analista: "Fernanda Alves" }
+];
+
+// Afastamentos para ASO
+
+const afastamentosASO = [
+  { motorista: "Maria Joana",     tipoAfastamento: "ASO", dataInicio: "2024-09-10T00:00-03:00", dataFim: "2024-09-11T00:00-03:00", local: "Senador Canedo-GO",   analista: "Kevin Rocha" },
+  { motorista: "Felipe Souza",    tipoAfastamento: "ASO", dataInicio: "2024-09-26T00:00-03:00", dataFim: "2024-09-27T00:00-03:00", local: "Goiânia-GO",          analista: "Paulo Júnior" },
+  { motorista: "João Silva",      tipoAfastamento: "ASO", dataInicio: "2024-09-10T00:00-03:00", dataFim: "2024-09-11T00:00-03:00", local: "Aparecida de Goiânia-GO", analista: "Kevin Rocha" },
+  { motorista: "Ana Clara",       tipoAfastamento: "ASO", dataInicio: "2024-09-16T00:00-03:00", dataFim: "2024-09-17T00:00-03:00", local: "Catalão-GO",          analista: "Paulo Júnior" },
+  { motorista: "Pedro Henrique",  tipoAfastamento: "ASO", dataInicio: "2024-09-09T00:00-03:00", dataFim: "2024-09-10T00:00-03:00", local: "Palmas-TO",           analista: "Paulo Júnior" },
+  { motorista: "Larissa Lima",    tipoAfastamento: "ASO", dataInicio: "2024-09-13T00:00-03:00", dataFim: "2024-09-14T00:00-03:00", local: "Jataí-GO",            analista: "Paulo Júnior" },
+  { motorista: "Rafael Oliveira", tipoAfastamento: "ASO", dataInicio: "2024-09-12T00:00-03:00", dataFim: "2024-09-13T00:00-03:00", local: "Anápolis-GO",         analista: "Fernanda Alves" },
+  { motorista: "Camila Santos",   tipoAfastamento: "ASO", dataInicio: "2024-09-16T00:00-03:00", dataFim: "2024-09-17T00:00-03:00", local: "Barreiras-BA",        analista: "Fernanda Alves" },
+  { motorista: "Lucas Almeida",   tipoAfastamento: "ASO", dataInicio: "2024-09-22T00:00-03:00", dataFim: "2024-09-23T00:00-03:00", local: "Montes Claros-MG",    analista: "Fernanda Alves" },
+  { motorista: "Sofia Costa",     tipoAfastamento: "ASO", dataInicio: "2024-09-07T00:00-03:00", dataFim: "2024-09-08T00:00-03:00", local: "Goiânia-GO",          analista: "Fernanda Alves" }
+];
+
+// Viagens
+
+const viagens = [
+  { caminhao: "ABC-1234", motorista: "Maria Joana",     dataInicio: "2024-09-14T00:00-03:00", dataFim: "2024-09-22T00:00-03:00", origem: "Rio Verde-GO", destino: "Gurupi-TO", analista: "Kevin Rocha" },
+  { caminhao: "XYZ-5678", motorista: "Felipe Souza",    dataInicio: "2024-09-06T00:00-03:00", dataFim: "2024-09-15T00:00-03:00", origem: "Anápolis-GO",  destino: "Catalão-GO", analista: "Paulo Júnior" },
+  { caminhao: "LMN-4567", motorista: "João Silva",      dataInicio: "2024-09-03T00:00-03:00", dataFim: "2024-09-07T00:00-03:00", origem: "Itumbiara-GO", destino: "Araguaína-TO", analista: "Kevin Rocha" },
+  { caminhao: "LMN-4567", motorista: "João Silva",      dataInicio: "2024-09-18T00:00-03:00", dataFim: "2024-09-23T00:00-03:00", origem: "Palmas-TO",    destino: "Barreiras-BA", analista: "Kevin Rocha" },
+  { caminhao: "PQR-8910", motorista: "Ana Clara",       dataInicio: "2024-09-05T00:00-03:00", dataFim: "2024-09-10T00:00-03:00", origem: "Imperatriz-MA", destino: "São Luís-MA", analista: "Paulo Júnior" },
+  { caminhao: "PQR-8910", motorista: "Ana Clara",       dataInicio: "2024-09-17T00:00-03:00", dataFim: "2024-09-21T00:00-03:00", origem: "São Luís-MA",  destino: "Balsas-MA", analista: "Paulo Júnior" },
+  { caminhao: "STU-1122", motorista: "Pedro Henrique",  dataInicio: "2024-09-04T00:00-03:00", dataFim: "2024-09-08T00:00-03:00", origem: "Montes Claros-MG", destino: "Paracatu-MG", analista: "Paulo Júnior" },
+  { caminhao: "STU-1122", motorista: "Pedro Henrique",  dataInicio: "2024-09-12T00:00-03:00", dataFim: "2024-09-16T00:00-03:00", origem: "Goiânia-GO",   destino: "Uberlândia-MG", analista: "Paulo Júnior" },
+  { caminhao: "VWX-3344", motorista: "Larissa Lima",    dataInicio: "2024-09-07T00:00-03:00", dataFim: "2024-09-12T00:00-03:00", origem: "Jataí-GO",     destino: "Campo Grande-MS", analista: "Paulo Júnior" },
+  { caminhao: "VWX-3344", motorista: "Larissa Lima",    dataInicio: "2024-09-19T00:00-03:00", dataFim: "2024-09-24T00:00-03:00", origem: "Caldas Novas-GO", destino: "Rondonópolis-MT", analista: "Paulo Júnior" },
+  { caminhao: "YZA-5566", motorista: "Rafael Oliveira", dataInicio: "2024-09-02T00:00-03:00", dataFim: "2024-09-06T00:00-03:00", origem: "Luziânia-GO",  destino: "Brasília-DF", analista: "Fernanda Alves" },
+  { caminhao: "YZA-5566", motorista: "Rafael Oliveira", dataInicio: "2024-09-16T00:00-03:00", dataFim: "2024-09-20T00:00-03:00", origem: "Araguaína-TO", destino: "Gurupi-TO", analista: "Fernanda Alves" },
+  { caminhao: "BCD-7788", motorista: "Camila Santos",   dataInicio: "2024-09-10T00:00-03:00", dataFim: "2024-09-14T00:00-03:00", origem: "Aparecida de Goiânia-GO", destino: "Formosa-GO", analista: "Fernanda Alves" },
+  { caminhao: "BCD-7788", motorista: "Camila Santos",   dataInicio: "2024-09-20T00:00-03:00", dataFim: "2024-09-25T00:00-03:00", origem: "Porangatu-GO", destino: "Barreiras-BA", analista: "Fernanda Alves" },
+  { caminhao: "EFG-9900", motorista: "Lucas Almeida",   dataInicio: "2024-09-11T00:00-03:00", dataFim: "2024-09-15T00:00-03:00", origem: "Ceres-GO",     destino: "Uruaçu-GO", analista: "Fernanda Alves" },
+  { caminhao: "EFG-9900", motorista: "Lucas Almeida",   dataInicio: "2024-09-15T00:00-03:00", dataFim: "2024-09-20T00:00-03:00", origem: "Jataí-GO",     destino: "Campo Grande-MS", analista: "Fernanda Alves" },
+  { caminhao: "HIJ-3344", motorista: "Sofia Costa",     dataInicio: "2024-09-11T00:00-03:00", dataFim: "2024-09-16T00:00-03:00", origem: "Goiânia-GO",   destino: "Anápolis-GO", analista: "Fernanda Alves" },
+  { caminhao: "HIJ-3344", motorista: "Sofia Costa",     dataInicio: "2024-09-18T00:00-03:00", dataFim: "2024-09-23T00:00-03:00", origem: "Araguaína-TO", destino: "Palmas-TO", analista: "Fernanda Alves" }
+];
+
+// Ocorrências
+
+const ocorrencias = [
+  { dataHora: "2024-09-15T08:00:00-03:00", motorista: "Maria Joana",     caminhao: "ABC-1234", label: "Acidente", descricao: "Um acidente com danos materiais.", analista: "Kevin Rocha", local: "Minaçu-GO"},
+  { dataHora: "2024-09-07T14:00:00-03:00", motorista: "Felipe Souza",    caminhao: "XYZ-5678", label: "Ponte Interditada", descricao: "Uma ponte interditada causou atraso de 3 horas.", analista: "Paulo Júnior", local: "Jataí-GO"},
+  { dataHora: "2024-09-09T09:00:00-03:00", motorista: "Felipe Souza",    caminhao: "XYZ-5678", label: "Pneu Furado", descricao: "O caminhão teve um pneu furado durante a viagem.", analista: "Paulo Júnior", local: "Senador Canedo-GO"},
+  { dataHora: "2024-09-04T08:00:00-03:00", motorista: "João Silva",      caminhao: "LMN-3456", label: "Carga Mal Acondicionada", descricao: "Parte da carga estava mal acondicionada, gerando atrasos.", analista: "Kevin Rocha", local: "Uruaçu-GO"},
+  { dataHora: "2024-09-08T15:30:00-03:00", motorista: "Ana Clara",       caminhao: "PQR-6789", label: "Problema Mecânico", descricao: "O caminhão apresentou um problema mecânico, necessitando de reparo.", analista: "Paulo Júnior", local: "Araguaína-TO"},
+  { dataHora: "2024-09-15T16:00:00-03:00", motorista: "Pedro Henrique",  caminhao: "STU-9012", label: "Desvio de Rota", descricao: "Desvio de rota devido a obras na estrada.", analista: "Paulo Júnior", local: "Paracatu-MG"},
+  { dataHora: "2024-09-10T17:45:00-03:00", motorista: "Larissa Lima",    caminhao: "VWX-3456", label: "Atraso na Entrega", descricao: "A entrega sofreu atraso devido a tráfego intenso.", analista: "Paulo Júnior", local: "Rio Verde-GO"},
+  { dataHora: "2024-09-17T14:20:00-03:00", motorista: "Rafael Oliveira", caminhao: "YZA-7890", label: "Carga Perigosa", descricao: "Problemas na documentação para transporte de carga perigosa.", analista: "Fernanda Alves", local: "Palmas-TO"},
+  { dataHora: "2024-09-10T09:00:00-03:00", motorista: "Camila Santos",   caminhao: "BCD-1122", label: "Pane Elétrica", descricao: "Pane elétrica interrompeu a viagem por 4 horas.", analista: "Fernanda Alves", local: "Barreiras-BA"},
+  { dataHora: "2024-09-16T16:00:00-03:00", motorista: "Lucas Almeida",   caminhao: "EFG-3344", label: "Clima Adverso", descricao: "Chuva forte e visibilidade reduzida causaram atrasos.", analista: "Fernanda Alves", local: "Montes Claros-MG"},
+  { dataHora: "2024-09-13T14:30:00-03:00", motorista: "Sofia Costa",     caminhao: "HIJ-5566", label: "Erro de Planejamento", descricao: "Rotas incorretas programadas no sistema de logística.", analista: "Fernanda Alves", local: "Goiânia-GO"}
+];
+
+// Atualizações de localização
+
+const statusAtualizacoes = [
+  { motorista: "Maria Joana",     caminhao: "ABC-1234", dataHora: "2024-09-19T09:00-03:00", local: "Alvorada-TO",      analista: "Kevin Rocha" },
+  { motorista: "Felipe Souza",    caminhao: "XYZ-5678", dataHora: "2024-09-17T18:00-03:00", local: "Posse-GO",         analista: "Paulo Júnior" },
+  { motorista: "João Silva",      caminhao: "LMN-4567", dataHora: "2024-09-18T15:30-03:00", local: "Formosa-GO",       analista: "Kevin Rocha" },
+  { motorista: "Ana Clara",       caminhao: "PQR-6789", dataHora: "2024-09-19T09:00-03:00", local: "Araguaína-TO",     analista: "Paulo Júnior" },
+  { motorista: "Pedro Henrique",  caminhao: "STU-9012", dataHora: "2024-09-18T17:45-03:00", local: "Barreiras-BA",     analista: "Paulo Júnior" },
+  { motorista: "Larissa Lima",    caminhao: "VWX-3456", dataHora: "2024-09-19T08:00-03:00", local: "Palmas-TO",        analista: "Paulo Júnior" },
+  { motorista: "Rafael Oliveira", caminhao: "YZA-7890", dataHora: "2024-09-19T08:20-03:00", local: "Gurupi-TO",        analista: "Fernanda Alves" },
+  { motorista: "Camila Santos",   caminhao: "BCD-1122", dataHora: "2024-09-19T08:45-03:00", local: "Montes Claros-MG", analista: "Fernanda Alves" },
+  { motorista: "Lucas Almeida",   caminhao: "EFG-9900", dataHora: "2024-09-18T16:30-03:00", local: "Rio Verde-GO",     analista: "Fernanda Alves" },
+  { motorista: "Sofia Costa",     caminhao: "HIJ-5566", dataHora: "2024-09-19T09:50-03:00", local: "Goiânia-GO",       analista: "Fernanda Alves" }
+];
+
+// Processar os dados acima no gráfico
+
+</script>
+
+
+
+
+<script>
+
+// Funções para adicionar dados ao Dataset do Chart.js
+
+// Adicionar os eventos dos caminhões ao dataset
+function addEventosCaminhoesDataset(datasets) {
+  datasets.push({
+    label: 'Eventos dos Caminhões',
+    data: eventosCaminhoes.map(e => ({
+      x: [new Date(e.dataInicio), new Date(e.dataFim)], // Período do evento
+      y: e.caminhao, // Caminhão relacionado
+      tipoEvento: e.tipoEvento,
+      local: e.local
+    })),
+    backgroundColor: "#8A2BE2", // Roxo Vibrante (Blue Violet)
+    borderColor: "white",
+    borderWidth: 2,
+    order: 30 // Ordem para exibição no gráfico
+  });
+}
+	
+// Adicionar eventos de folgas dos motoristas ao dataset
+function addFolgasFeriasMotoristasDataset(datasets){
+  datasets.push({
+    label: 'Folga',
+    data: folgasFerias.map(f => ({
+      x: [new Date(f.dataInicio), new Date(f.dataFim)],
+      y: f.motorista,
+      origem: f.local,
+      analista: f.analista
+    })),
+    backgroundColor: "#FF6347", // Vermelho Alaranjado (Tomato)
+    borderColor: "white",
+    borderWidth: 2,
+    order: 33
+  });	
+}
+
+// Adicionar eventos de ASO dos motoristas ao dataset
+function addAsoMotoristasDataset(datasets){
+  datasets.push({
+    label: 'ASO',
+    data: afastamentosASO.map(a => ({
+      x: [new Date(a.dataInicio), new Date(a.dataFim)],
+      y: a.motorista,
+      origem: a.local,
+      analista: a.analista
+    })),
+    backgroundColor: "#FFA07A", // Laranja Suave (Light Salmon)
+    borderColor: "white",
+    borderWidth: 2,
+    order: 32
+  });
+}
+
+// Adicionar viagens ao dataset
+function addViagensDataset(datasets){
+  datasets.push({
+    label: 'Viagem',
+    data: viagens.map(v => ({
+      x: [new Date(v.dataInicio), new Date(v.dataFim)],
+      y: v.motorista,
+      origem: v.origem,
+      destino: v.destino,
+      caminhao: v.caminhao,
+      analista: v.analista
+    })),
+    backgroundColor: "#4169E1", // Azul Royal (Royal Blue)
+    borderColor: "white",
+    borderWidth: 2,
+    order: 31
+  });
+}
+
+// Adicionar os dados de Ocorrências
+function addOcorrenciasDataset(datasets){
+  datasets.push({
+    label: 'Ocorrências',
+    type: 'scatter',
+    data: ocorrencias.map(o => ({
+      x: new Date(o.dataHora),
+      y: o.motorista,
+      caminhao: o.caminhao,
+      label: o.label,
+      descricao: o.descricao,
+      analista: o.analista,
+      local: o.local
+    })),
+    //backgroundColor: "#FFD700", // Amarelo Dourado (Gold)
+    backgroundColor: "#FFE700", // Amarelo
+    borderColor: "black",
+    borderWidth: 2,
+    pointStyle: 'rectRot',
+    radius: 12,
+    hoverRadius: 12,
+    order: 22
+  });
+}
+
+// Adicionar os dados de Última Localização
+function addUltimaLocalizacao(datasets){
+  datasets.push({
+    label: 'Última Localização Informada',
+    type: 'scatter',
+    data: statusAtualizacoes.map(s => ({
+      x: new Date(s.dataHora),
+      y: s.motorista,
+      local: s.local,
+      caminhao: s.caminhao,
+      analista: s.analista
+    })),
+    //backgroundColor: "#32CD32", // Verde Limão (Lime Green)
+    //backgroundColor: "#00FF00", // Verde máximo
+    //backgroundColor: "#50C878", // Emerald Green // escuro
+    //backgroundColor: "#66CDAA", // Medium Aquamarine // azulado
+    //backgroundColor: "#98FF98", // Mint Green // esbranquiçado
+    //backgroundColor: "#00FF7F", // Spring Green // quase ciano
+    backgroundColor: "#32EE32", // Verde
+    borderColor: "black",
+    borderWidth: 2,
+    pointStyle: 'rectRot',
+    radius: 12,
+    hoverRadius: 12,
+    order: 21
+  });
+}
+
+// Adicionar dados vazios para o Dataset "Análise Futura"
+function addAnaliseFuturaDataset(datasets){
+  datasets.push({
+    label: 'Análise Futura',
+    data: [],
+    backgroundColor: "rgba(220, 220, 220, 0.5)", // Cinza Translúcido
+    borderColor: "blue", // Azul
+    borderWidth: 2,
+    order: 14
+  });
+}
+
+// Adicionar dados de "Disponível e Próximo"
+function addAnaliseFuturaDisponivelProximoDataset(datasets){
+  datasets.push({
+    label: 'Disponível e Próximo',
+    type: 'scatter',
+    data: [],
+    //backgroundColor: "#00CED1", // Ciano Moderno (Dark Turquoise)
+    backgroundColor: "#32EE32", // Verde
+    borderColor: "blue",
+    borderWidth: 2,
+    pointStyle: 'circle',
+    radius: 16,
+    hoverRadius: 16,
+    order: 11
+  });
+}
+
+// Adicionar dados de "Disponível e Distante"
+function addAnaliseFuturaDisponivelDistanteDataset(datasets){
+  datasets.push({
+    label: 'Disponível e Distante',
+    type: 'scatter',
+    data: [],
+    //backgroundColor: "#FFD700", // Amarelo Dourado (Gold)
+    backgroundColor: "#FFE700", // Amarelo
+    borderColor: "blue",
+    borderWidth: 2,
+    pointStyle: 'circle',
+    radius: 10,
+    hoverRadius: 10,
+    order: 12
+  });
+}
+
+// Adicionar dados de "Não Disponível"
+function addAnaliseFuturaNaoDisponivelDataset(datasets){
+  datasets.push({
+    label: 'Não Disponível',
+    type: 'scatter',
+    data: [],
+    backgroundColor: "#F08080", // Vermelho Coral (Light Coral)
+    borderColor: "black",
+    borderWidth: 1,
+    pointStyle: 'circle',
+    radius: 8,
+    hoverRadius: 8,
+    order: 13
+  });
+}
+
+</script>
+
+
+
+
+
+<script>
+// Função auxiliar para formatar datas no formato dd/MM/yyyy HH:mm
+function formatDate(date) {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+  return new Intl.DateTimeFormat('pt-BR', options).format(date);
+}
+
+// Função para quebrar textos longos em múltiplas linhas
+function wrapText(text, limit) {
+  const lines = [];
+  let line = "";
+  text.split(" ").forEach(word => {
+    if ((line + word).length > limit) {
+      lines.push(line);
+      line = word;
+    } else {
+      line += (line ? " " : "") + word;
+    }
+  });
+  if (line) lines.push(line);
+  return lines;
+}
+</script>
+
+
+<script>
+
+// Plugins customizados
+
+// Data "now" utilizada
+const now = new Date('2024-09-19T10:00:00');
+
+// Plugin customizado para desenhar uma linha vertical
+const verticalLinePlugin = {
+  id: 'verticalLine',
+  beforeDraw: (chart) => {
+    const ctx = chart.ctx;
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+    const xPosition = xScale.getPixelForValue(now);
+
+    // Desenhar a linha
+    ctx.save();
+    ctx.beginPath();
+    ctx.setLineDash([10, 5]); // Define o padrão de traços: [tamanho do traço, tamanho do espaço]
+    ctx.moveTo(xPosition, yScale.top); // Início da linha no topo do gráfico
+    ctx.lineTo(xPosition, yScale.bottom); // Fim da linha na parte inferior do gráfico
+    ctx.lineWidth = 5; // Espessura da linha
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)'; // Cor da linha preta
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+
+
+// Plugin customizado para adicionar texto de distância
+const addDistanceTextPlugin = {
+  id: 'addDistanceText',
+  afterDatasetDraw(chart, args, options) {
+    const { ctx } = chart;
+    const datasets = chart.data.datasets;
+
+    datasets.forEach(dataset => {
+      const meta = chart.getDatasetMeta(datasets.indexOf(dataset));
+
+      // Verificar se o dataset está visível
+      if (meta.visible && ['Disponível e Próximo', 'Disponível e Distante'].includes(dataset.label)) {
+        dataset.data.forEach((dataPoint, index) => {
+          const point = meta.data[index];
+
+          if (point) {
+            const distance = dataPoint.distancia || 'Distância não informada';
+
+            // Ajuste da posição do texto
+            const xPosition = point.x + 10; // 10px à direita do ponto
+            const yPosition = point.y + 1; // Ajuste vertical
+
+            // Medir o texto para ajustar o fundo
+            ctx.font = '14px Arial'; // Estilização do texto
+            const textWidth = ctx.measureText(distance).width;
+            const textHeight = 14; // Altura aproximada da fonte
+
+            // Desenhar o fundo branco
+            ctx.fillStyle = '#fff'; // Cor de fundo
+            ctx.fillRect(xPosition - 4, yPosition - textHeight + 4, textWidth + 8, textHeight + 4);
+
+            // Desenhar o texto
+            ctx.fillStyle = '#000'; // Cor do texto
+            ctx.textAlign = 'left'; // Alinhamento à esquerda
+            ctx.fillText(distance, xPosition, yPosition); // Adicionar texto com pequeno ajuste vertical
+          }
+        });
+      }
+    });
+  }
+};
+
+
+// Plugin para fazer linha vertical da grade ficar mais destacada na mudança de dias no painel
+const darkenMidnightGridPlugin = {
+  id: 'darkenMidnightGrid',
+  beforeDraw: (chart) => {
+    const { ctx, scales: { x, y } } = chart;
+
+    // Salvar o estado original do contexto
+    ctx.save();
+
+    // Estilização da linha
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.04)'; // Cor mais escura
+    ctx.lineWidth = 8; // Largura da linha
+
+    // Percorrer os ticks do eixo X
+    x.ticks.forEach((tick) => {
+      const label = x.getLabelForValue(tick.value); // Obter o label do tick
+      if (label.includes('00:00')) { // Verificar se o horário é meia-noite
+        const xPosition = x.getPixelForValue(tick.value); // Posição no gráfico
+
+        // Desenhar a linha vertical mais escura
+        ctx.beginPath();
+        ctx.moveTo(xPosition, y.top); // Começar no topo
+        ctx.lineTo(xPosition, y.bottom); // Descer até a base
+        ctx.stroke();
+      }
+    });
+
+    // Restaurar o contexto original
+    ctx.restore();
+  }
+};
+
+
+
+// ---------------------------------------------------------------------
+
+
+
+// Transformar dados JSON em estrutura compatível com Chart.js
+function prepareData() {
+  const datasets = [];
+
+  // Adicionar os dados de Folgas/Férias
+  addFolgasFeriasMotoristasDataset(datasets);
+
+  // Adicionar os dados de ASO
+  addAsoMotoristasDataset(datasets);
+
+  // Adicionar os dados de Viagens
+  addViagensDataset(datasets);
+
+  // Adicionar os dados de Ocorrências
+  addOcorrenciasDataset(datasets);
+
+  // Adicionar os dados de Última Localização
+  addUltimaLocalizacao(datasets);
+
+  // Adicionar dados de "Análise Futura" (vazio)
+  addAnaliseFuturaDataset(datasets);
+
+  // Adicionar dados de "Disponível e Próximo" (vazio)
+  addAnaliseFuturaDisponivelProximoDataset(datasets);
+  
+  // Adicionar dados de "Disponível e Distante" (vazio)
+  addAnaliseFuturaDisponivelDistanteDataset(datasets);
+
+  // Adicionar dados de "Não Disponível" (vazio)
+  addAnaliseFuturaNaoDisponivelDataset(datasets);
+
+  return datasets;
+}
+
+// Inicialização do Chart.js
+ctx = document.getElementById('chart').getContext('2d');
+myChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: motoristas.map(m => m.nome),
+    datasets: prepareData()  // <-------------------- Receber o dataset da função "prepareData()"
+  },
+  options: {
+	animation: { duration: 0 },
+    responsive: false,
+    indexAxis: 'y',
+    plugins: {
+      legend: { position: 'top' },
+      title: { display: true, text: 'Atividades, Ocorrências e Afastamentos' },
+      zoom: {
+		limits:{
+		  //x: { minRange: 1000 * 60 * 60 * 24 * 18 }, // Minimo de 18 dias de zoom
+		  x: { minRange: 1000 * 60 * 60 * 21 }, // Minimo de 21 horas de zoom (permite ver blocos de horas).
+		},
+        zoom: {
+          wheel: {
+            enabled: true,
+            modifierKey: 'ctrl', // usar tecla ctrl e scroll do mouse para dar zoom (default é null: apenas scroll do mouse)
+          },
+          drag: {
+			enabled: true,
+			modifierKey: 'alt', // para dar zoom selecionando área (default: null)
+			backgroundColor: 'rgba(225,225,225,0.3)', // default: 'rgba(225,225,225,0.3)',
+			borderColor: 'rgba(5,5,5)', // default: 'rgba(225,225,225)',
+			borderWidth: 3, // default: 0,
+		  },
+          pinch: {
+            enabled: true
+          },
+          mode: 'xy',
+          //onZoom: ({ chart }) => console.log('Zoom em andamento', chart),
+          //onZoomComplete: ({ chart }) => console.log('Zoom concluído', chart)
+        },
+        pan: {
+		  enabled: true,
+		  mode: 'xy',
+		  modifierKey: 'shift',
+		  scaleMode: 'xy',
+		  threshold: 10,
+          //onPan: ({ chart }) => console.log('Pan em andamento', chart),
+          //onPanComplete: ({ chart }) => console.log('Pan concluído', chart)	  
+		},
+      },
+  	  tooltip: {
+	    position: 'nearest',
+	    titleFont: {
+          size: 20,
+          weight: 800
+        },
+        bodyFont: {
+          size: 16,
+          weight: 800
+        },
+        footerFont: {
+          size: 14
+        },
+	    callbacks: {
+		  label: function(context) {
+
+		    if (context.dataset.label === 'Última Localização Informada') {
+		      const local = context.raw.local || "Local desconhecido";
+              const ultimaAtualizacao = formatDate(context.raw.x);
+		      const caminhao = context.raw.caminhao || "Caminhão não informado";
+		      const analista = context.raw.analista || "Analista não informado";
+		      return [
+		        `Motorista: ${context.raw.y}`,
+		        `Última Atualização: ${ultimaAtualizacao}`,
+		        `Local: ${local}`,
+		        `Caminhão: ${caminhao}`,
+		        `Analista: ${analista}`
+		      ];
+
+		    } else if (context.dataset.label === 'Ocorrências') {
+              const descricao = context.raw.descricao || "Sem descrição.";
+              const caminhao = context.raw.caminhao || "Caminhão não informado";
+              const analista = context.raw.analista || "Analista não informado";
+              const local = context.raw.local || "Local não informado";
+              return [
+                `Ocorrência: ${context.raw.label}`,
+                `Data: ${formatDate(context.raw.x)}`,                
+                `Caminhão: ${caminhao}`,
+                `Local: ${local}`,
+		        `Analista: ${analista}`,
+		        ...wrapText(descricao, 40),
+              ];
+
+            } else if (context.dataset.label === 'Viagem') {
+			  const origem = context.raw.origem || "Origem desconhecida";
+			  const destino = context.raw.destino || "Destino desconhecido";
+              const caminhao = context.raw.caminhao || "Caminhão não informado";
+              const analista = context.raw.analista || "Analista não informado";
+			  return [
+			    `${context.dataset.label}: ${formatDate(context.raw.x[0])} - ${formatDate(context.raw.x[1])}`,
+			    `Origem: ${origem}`,
+			    `Destino: ${destino}`,
+			    `Caminhão: ${caminhao}`,
+		        `Analista: ${analista}`
+			  ];
+
+            } else if (context.dataset.label === 'Análise Futura') {
+			  const origem = context.raw.origem || "Origem desconhecida";
+			  const destino = context.raw.destino || "Destino desconhecido";
+              //const caminhao = context.raw.caminhao || "Caminhão não informado";
+              const analista = context.raw.analista || "Analista não informado";
+              const analise = context.raw.analise || "Análise não informada";
+			  return [
+			    `${context.dataset.label}: ${formatDate(context.raw.x[0])} - ${formatDate(context.raw.x[1])}`,
+			    `Origem: ${origem}`,
+			    `Destino: ${destino}`,
+			    //`Caminhão: ${caminhao}`,
+		        `Analista: ${analista}`,
+		        ...wrapText(analise, 50)
+			  ];
+
+		    } else if (context.dataset.label === 'Folga' || context.dataset.label === 'ASO') {
+			  const local = context.raw.origem || "Local desconhecido";
+			  const analista = context.raw.analista || "Analista não informado";
+			  return [
+			    `${context.dataset.label}: ${formatDate(context.raw.x[0])} - ${formatDate(context.raw.x[1])}`,
+			    `Local: ${local}`,
+			    `Analista: ${analista}`
+			  ];
+
+		    } else {
+			  return [`${context.dataset.label}: ${formatDate(context.raw.x)}`];
+		    }
+
+		  }
+	    }
+	  }
+    },
+    //scales: {
+      //y: { type: 'category', stacked: true },
+      //x: { type: 'time', min: new Date('2024-09-01T00:00:00'), max: new Date('2024-09-30T00:00:00') }
+    //},
+	scales: {
+	  y: { type: 'category', stacked: true },
+	  x: {
+		type: 'time',
+		time: {
+		  unit: 'hour',          // Unidade base: hora
+		  //stepSize: 6,           // Intervalo desejado em horas
+		  tooltipFormat: 'dd/MM/yyyy HH:mm', // Formato do tooltip
+		  displayFormats: {
+			hour: 'HH:mm',       // Formato de exibição para horas
+			day: 'dd/MM'         // Formato de exibição para dias
+		  }
+		},
+		ticks: {
+		  source: 'auto',        // Ticks automáticos dentro da unidade
+		  major: { enabled: true }, // Habilita os ticks "maiores" para melhor legibilidade
+		  callback: function(val, index) {
+			// Mapeamento dos meses em português
+			//const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+			const meses = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+
+			// Verifica se o valor contém "/" (indicativo de data)
+			if (val.includes('/')) {
+			  const [dia, mes] = val.split('/'); // Divide a string no "/"
+			  const nomeMes = meses[parseInt(mes, 10) - 1]; // Obtém o nome do mês ajustando o índice
+			  //return `${dia} ${nomeMes}`; // Retorna no formato "19 Set"
+			  return `${nomeMes} ${dia}`; // Retorna no formato "SET 19"
+			}
+			return val; // Retorna o valor original se não houver "/"
+		  },
+		},
+		min: new Date('2024-09-01T00:00:00'), // Limite inferior inicial
+		max: new Date('2024-09-30T00:00:00')  // Limite superior inicial
+	  }
+    },
+  },
+  plugins: [verticalLinePlugin, addDistanceTextPlugin, darkenMidnightGridPlugin]
+});
+</script>
+
+
+
+
+
+<!--
+
+Guardar dataset original inicial, para poder restaurá-lo após o uso de filtros.
+
+-->
+
+<script>
+// Variável global para armazenar os dados originais
+let originalInitialDatasets;
+
+// Função para armazenar o dataset original inicial
+function armazenarDadosOriginaisIniciais() {
+  originalInitialDatasets = myChart.data.datasets.map(dataset => ({
+    ...dataset,
+    data: dataset.data.map(dataPoint => ({
+      ...dataPoint,
+      x: Array.isArray(dataPoint.x)
+        ? dataPoint.x.map(date => new Date(date)) // Se for um intervalo de datas
+        : new Date(dataPoint.x) // Se for uma única data
+    }))
+  }));
+}
+
+// Chamada inicial para armazenar os dados originais
+armazenarDadosOriginaisIniciais();
+
+// Armazenar as labels originais do eixo `y`
+let originalLabelsY = [...myChart.options.scales.y.labels || []];
+
+
+// Função para restaurar os dados originais
+function restaurarDadosOriginaisIniciais() {
+  // Restaurar datasets ao estado original
+  myChart.data.datasets = originalInitialDatasets.map(dataset => ({
+    ...dataset,
+    data: dataset.data.map(dataPoint => ({
+      ...dataPoint,
+      x: Array.isArray(dataPoint.x)
+        ? dataPoint.x.map(date => new Date(date)) // Reconverter intervalos de strings para `Date`
+        : new Date(dataPoint.x) // Reconverter strings para `Date`
+    }))
+  }));
+
+  // Restaurar labels do eixo `y`
+  myChart.options.scales.y.labels = [...originalLabelsY];
+
+  // Atualizar o gráfico
+  myChart.update();
+}
+</script>
+
+<!--
+<button onclick="restaurarDadosOriginaisIniciais()">Restaurar Dados Iniciais</button>
+-->
+
+
+
+
+<!-- Formulário para Análise de Viagem Futura -->
+
+<script>
+  // Função para resetar o zoom
+  function resetZoom() {
+    if (myChart) {
+      myChart.resetZoom(); // Reseta o zoom para os limites iniciais
+    }
+  }
+</script>
+
+
+
+<form id="novaViagemForm">
+  <label for="dataInicio">Data de Início:</label>
+  <input type="text" id="dataInicio" name="dataInicio" placeholder="2024-09-24T12:00" size=13 title="AAAA-MM-DDTHH:MM" value="2024-09-24T00:00">
+
+  <label for="dataFim">Data de Fim:</label>
+  <input type="text" id="dataFim" name="dataFim" placeholder="2024-09-27T18:00" size=13 title="AAAA-MM-DDTHH:MM" value="2024-09-29T00:00">
+
+  <label for="origem">Origem:</label>
+  <input type="text" id="origem" name="origem" placeholder="Cidade de Origem">
+
+  <label for="destino">Destino:</label>
+  <input type="text" id="destino" name="destino" placeholder="Cidade de Destino">
+
+  <button type="button" onclick="adicionarViagem()">Adicionar Viagem</button>
+  <button type="button" onclick="restaurarDadosOriginaisIniciais()">Restaurar Dados</button>
+
+  <button type="button" onclick="resetZoom()">Reset Zoom</button>
+
+</form>
+
+<script>
+
+// Função para gerar visualização de Análise de Viagem Futura
+
+function adicionarViagem() {
+  // Obter os valores do formulário
+  const form = document.getElementById('novaViagemForm');
+
+  const dataInicioText = form.querySelector('#dataInicio').value;
+  const dataFimText = form.querySelector('#dataFim').value;
+
+  const dataInicio = new Date(dataInicioText);
+  const dataFim = new Date(dataFimText);
+  const origem = form.origem.value;
+  const destino = form.destino.value;
+
+  if (!dataInicio || !dataFim || !origem || !destino) {
+    alert("Por favor, preencha todos os campos!");
+    return;
+  }
+
+  // Função para calcular a distância (Exemplo fictício)
+  function calcularDistancia(local1, local2) {
+    const distanciaMock = {
+      "Porangatu-GO": 50,
+      "Anápolis-GO": 900,
+      "Iporá-GO": 70,
+    };
+    return distanciaMock[local2] || Math.floor(Math.random() * 1200) + 1; // Simular distância
+  }
+
+  // Categorizar motoristas nos datasets apropriados
+  const disponivelProximo = [];
+  const disponivelDistante = [];
+  const naoDisponivel = [];
+  const analiseFutura = [];
+
+  motoristas.forEach((motorista) => {
+    const conflitos = [];
+    let categoria = "";
+
+    // Verificar conflitos com folgas
+    folgasFerias.forEach((folga) => {
+      if (
+        folga.motorista === motorista.nome &&
+        (dataInicio < new Date(folga.dataFim) && dataFim > new Date(folga.dataInicio))
+      ) {
+        conflitos.push("NÃO Disponível: Conflito com folga agendada");
+        categoria = "Não Disponível";
+      }
+    });
+
+    // Verificar conflitos com ASO
+    afastamentosASO.forEach((aso) => {
+      if (
+        aso.motorista === motorista.nome &&
+        (dataInicio < new Date(aso.dataFim) && dataFim > new Date(aso.dataInicio))
+      ) {
+        conflitos.push("NÃO Disponível: Conflito com ASO agendado");
+        categoria = "Não Disponível";
+      }
+    });
+
+    // Verificar conflitos com Viagens
+    viagens.forEach((viagem) => {
+      if (
+        viagem.motorista === motorista.nome &&
+        (dataInicio < new Date(viagem.dataFim) && dataFim > new Date(viagem.dataInicio))
+      ) {
+        conflitos.push("NÃO Disponível: Conflito com viagem já programada");
+        categoria = "Não Disponível";
+      }
+    });
+
+    // Calcular distância
+    const distancia = calcularDistancia(origem, motorista.cidadeUF);
+
+    // Determinar categoria
+    if (conflitos.length === 0) {
+      if (distancia < 200) {
+        categoria = "Disponível e Próximo";
+      } else {
+        categoria = "Disponível e Distante";
+      }
+    }
+
+    // Criar o objeto de análise
+    const analise = conflitos.length > 0
+      ? conflitos.join("; ")
+      : categoria === "Disponível e Próximo"
+        ? `Disponível E Próximo ao local de origem: ${distancia} km`
+        : `Disponível MAS Distante do local de origem: ${distancia} km`;
+
+    const novoDado = {
+      x: dataInicio, // Apenas a data de início é relevante
+      y: motorista.nome,
+      origem,
+      destino,
+      analista: motorista.analista || "Desconhecido",
+      caminhão: "Caminhão Não Informado", // Você pode associar caminhões reais
+      local: origem,
+      distancia: `${distancia} km`,
+      motivo: conflitos.join("; "),
+      analise,
+    };
+
+    // Adicionar ao dataset apropriado
+    if (categoria === "Disponível e Próximo") {
+      disponivelProximo.push(novoDado);
+    } else if (categoria === "Disponível e Distante") {
+      disponivelDistante.push(novoDado);
+    } else if (categoria === "Não Disponível") {
+      naoDisponivel.push(novoDado);
+    }
+
+    // Adicionar ao dataset de Análise Futura
+    analiseFutura.push({
+      ...novoDado,
+      x: [dataInicio, dataFim], // Para o dataset "Análise Futura" usamos um intervalo
+    });
+  });
+
+  // Atualizar datasets no gráfico
+  const datasets = myChart.data.datasets;
+
+  // Atualizar o dataset "Análise Futura"
+  const analiseFuturaDataset = datasets.find((d) => d.label === "Análise Futura");
+  analiseFuturaDataset.data = analiseFutura;
+
+  // Atualizar o dataset "Disponível e Próximo"
+  const disponivelProximoDataset = datasets.find((d) => d.label === "Disponível e Próximo");
+  disponivelProximoDataset.data = disponivelProximo;
+
+  // Atualizar o dataset "Disponível e Distante"
+  const disponivelDistanteDataset = datasets.find((d) => d.label === "Disponível e Distante");
+  disponivelDistanteDataset.data = disponivelDistante;
+
+  // Atualizar o dataset "Não Disponível"
+  const naoDisponivelDataset = datasets.find((d) => d.label === "Não Disponível");
+  naoDisponivelDataset.data = naoDisponivel;
+
+  // Atualizar o gráfico
+  myChart.update();
+  let beforeFiltersDatasets = JSON.parse(JSON.stringify(myChart.data.datasets));
+
+  //alert("Análise adicionada com sucesso!");
+}
+
+
+</script>
+
+
+<!--
+========================================================================
+-->
+
+
+<div style="border: 0px solid red; height: 5px;"></div>
+
+
+Filtros e Ordenações:
+
+
+<button type="button" onclick="resetZoom()">Reset Zoom</button>
+
+<!-- =================================================================== -->
+
+
+
+<script>
+  // Variável global para controlar o estado da ordenação
+  let ordemUltimaAtualizacao = 'crescente';
+
+  // Função para alternar a ordenação de motoristas pela última atualização
+  function alternarOrdenacaoPorUltimaAtualizacao() {
+    // Localizar o dataset "Última Localização Informada"
+    const datasetUltimaLocalizacao = myChart.data.datasets.find(
+      dataset => dataset.label === "Última Localização Informada"
+    );
+
+    if (!datasetUltimaLocalizacao || !datasetUltimaLocalizacao.data.length) {
+      alert("Nenhuma informação de última atualização encontrada.");
+      return;
+    }
+
+    // Ordenar os motoristas pela data e hora de atualização
+    const motoristasOrdenados = [...datasetUltimaLocalizacao.data].sort((a, b) => {
+      const dataHoraA = new Date(a.x).getTime();
+      const dataHoraB = new Date(b.x).getTime();
+      return ordemUltimaAtualizacao === 'crescente'
+        ? dataHoraA - dataHoraB
+        : dataHoraB - dataHoraA;
+    }).map(item => item.y);
+
+    // Atualizar as labels do eixo `y`
+    myChart.options.scales.y = {
+      ...myChart.options.scales.y,
+      labels: motoristasOrdenados // Substituir as labels do eixo `y`
+    };
+
+    // Atualizar o gráfico
+    myChart.update();
+
+    // Alternar o estado da ordem para o próximo clique
+    ordemUltimaAtualizacao = ordemUltimaAtualizacao === 'crescente' ? 'decrescente' : 'crescente';
+
+    // Atualizar o texto do botão
+    const botao = document.getElementById('botaoOrdenacao');
+    botao.textContent = `Ordenar por Última Atualização (${ordemUltimaAtualizacao === 'crescente' ? 'Crescente' : 'Decrescente'})`;
+  }
+</script>
+
+<!-- Botão único para alternar ordenação -->
+<button id="botaoOrdenacao" onclick="alternarOrdenacaoPorUltimaAtualizacao()">Ordenar por Última Atualização (Crescente)</button>
+
+
+
+
+
+
+<script>
+  // Função para ordenar motoristas pela disponibilidade mais breve
+  function ordenarMotoristasPorDisponibilidade() {
+    const motoristasOrdenados = motoristas.map((motorista) => {
+      const nome = motorista.nome;
+
+      // Verificar atividades em andamento para o motorista
+      const atividadesEmAndamento = [];
+
+      // Checar Folgas
+      folgasFerias.forEach((folga) => {
+        if (
+          folga.motorista === nome &&
+          new Date(folga.dataInicio) <= now &&
+          now <= new Date(folga.dataFim)
+        ) {
+          atividadesEmAndamento.push(new Date(folga.dataFim));
+        }
+      });
+
+      // Checar ASO
+      afastamentosASO.forEach((aso) => {
+        if (
+          aso.motorista === nome &&
+          new Date(aso.dataInicio) <= now &&
+          now <= new Date(aso.dataFim)
+        ) {
+          atividadesEmAndamento.push(new Date(aso.dataFim));
+        }
+      });
+
+      // Checar Viagens
+      viagens.forEach((viagem) => {
+        if (
+          viagem.motorista === nome &&
+          new Date(viagem.dataInicio) <= now &&
+          now <= new Date(viagem.dataFim)
+        ) {
+          atividadesEmAndamento.push(new Date(viagem.dataFim));
+        }
+      });
+
+      // Verificar se o motorista está disponível ou não
+      if (atividadesEmAndamento.length === 0) {
+        // Disponível: Sem atividades em andamento
+        return { nome, disponivel: true, fimAtividade: null };
+      } else {
+        // Não disponível: Encontrar a atividade que termina mais cedo
+        const fimAtividadeMaisBreve = Math.min(...atividadesEmAndamento.map((d) => d.getTime()));
+        return { nome, disponivel: false, fimAtividade: new Date(fimAtividadeMaisBreve) };
+      }
+    });
+
+    // Ordenar motoristas:
+    // 1. Disponíveis primeiro
+    // 2. Não disponíveis, pelo tempo mais curto para disponibilidade
+    motoristasOrdenados.sort((a, b) => {
+      if (a.disponivel && !b.disponivel) return -1; // A disponível, B não
+      if (!a.disponivel && b.disponivel) return 1; // A não disponível, B disponível
+      if (!a.disponivel && !b.disponivel) {
+        // Ambos não disponíveis: Ordenar pelo tempo mais curto para disponibilidade
+        return a.fimAtividade - b.fimAtividade;
+      }
+      return 0; // Ambos disponíveis
+    });
+
+    // Atualizar as labels do eixo Y do gráfico
+    myChart.options.scales.y.labels = motoristasOrdenados.map((m) => m.nome);
+
+    // Atualizar o gráfico
+    myChart.update();
+  }
+</script>
+
+<!-- Botão para ordenar motoristas -->
+<button onclick="ordenarMotoristasPorDisponibilidade()">Ordenar por Disponibilidade</button>
+
+
+
+
+
+
+
+
+<!-- Ordenar motoristas com base nas folgas em comparação com "hoje" (now) -->
+<script>
+  function ordenarMotoristasPorProximaFolga() {
+    // Data atual utilizada
+    const nowDate = new Date(now);
+
+    // Processar as folgas e identificar a próxima folga para cada motorista
+    const motoristasProximasFolgas = motoristas.map((motorista) => {
+      // Filtrar folgas do motorista
+      const folgas = folgasFerias
+        .filter(folga => folga.motorista === motorista.nome)
+        .map(folga => ({
+          inicio: new Date(folga.dataInicio),
+          fim: new Date(folga.dataFim)
+        }));
+
+      // Identificar se está de folga agora
+      const folgaAtual = folgas.find(folga => folga.inicio <= nowDate && folga.fim >= nowDate);
+
+      // Identificar próxima folga futura
+      const folgaFutura = folgas
+        .filter(folga => folga.inicio > nowDate)
+        .sort((a, b) => a.inicio - b.inicio)[0];
+
+      return {
+        nome: motorista.nome,
+        folgaAtual,
+        folgaFutura,
+        ordenacao: folgaAtual
+          ? folgaAtual.fim // Se está de folga agora, usar fim da folga atual
+          : folgaFutura?.inicio || Infinity // Caso contrário, usar início da próxima folga futura ou infinito
+      };
+    });
+
+    // Ordenar os motoristas com base na ordenação calculada
+    motoristasProximasFolgas.sort((a, b) => a.ordenacao - b.ordenacao);
+
+    // Atualizar labels do eixo `y` com os motoristas ordenados
+    myChart.options.scales.y = {
+      ...myChart.options.scales.y,
+      labels: motoristasProximasFolgas.map(item => item.nome)
+    };
+
+    // Atualizar o gráfico
+    myChart.update();
+  }
+</script>
+
+<!-- Botão para ordenar motoristas por proximidade da próxima folga -->
+<button onclick="ordenarMotoristasPorProximaFolga()">Ordenar por Próxima Folga</button>
+
+
+
+
+
+
+
+<script>
+// Ocultar motoristas que não estão disponíveis após análise de viagem futura
+function aplicarFiltroNaoDisponiveis() {
+  // Identificar motoristas "Não Disponíveis"
+  const motoristasNaoDisponiveis = myChart.data.datasets
+    .find(dataset => dataset.label === "Não Disponível")
+    ?.data.map(item => item.y) || []; // Capturar nomes dos motoristas ou uma lista vazia
+
+  // Filtrar os datasets
+  myChart.data.datasets.forEach(dataset => {
+    dataset.data = dataset.data.filter(item => !motoristasNaoDisponiveis.includes(item.y));
+  });
+
+  // Atualizar as labels do eixo `y`
+  const motoristasRemovidos = new Set(motoristasNaoDisponiveis);
+  myChart.options.scales.y.labels = originalLabelsY.filter(label => !motoristasRemovidos.has(label));
+
+  // Atualizar o gráfico
+  myChart.update();
+
+  // Ordenar com base na distância para o local da análise de viagem futura
+  ordenarMotoristasPorDistancia()
+
+}
+</script>
+<button onclick="aplicarFiltroNaoDisponiveis()">Ocultar Não Disponíveis</button>
+
+
+<script>
+// Função para ordenar motoristas com base na distância
+function ordenarMotoristasPorDistancia() {
+  // Localizar os datasets "Disponível e Próximo" e "Disponível e Distante"
+  const datasetProximo = myChart.data.datasets.find(dataset => dataset.label === "Disponível e Próximo");
+  const datasetDistante = myChart.data.datasets.find(dataset => dataset.label === "Disponível e Distante");
+
+  // Combinar os dados de ambos os datasets
+  const motoristasDistancia = [
+    ...(datasetProximo?.data || []),
+    ...(datasetDistante?.data || [])
+  ];
+
+  // Ordenar os motoristas pela distância (convertendo distância para número)
+  motoristasDistancia.sort((a, b) => {
+    const distanciaA = parseInt(a.distancia.replace(" km", ""), 10);
+    const distanciaB = parseInt(b.distancia.replace(" km", ""), 10);
+    return distanciaA - distanciaB;
+  });
+
+  // Atualizar o eixo `y` com os motoristas ordenados
+  const motoristasOrdenados = motoristasDistancia.map(item => item.y);
+  myChart.options.scales.y = {
+    ...myChart.options.scales.y,
+    labels: motoristasOrdenados // Substituir as labels do eixo `y`
+  };
+
+  // Atualizar o gráfico
+  myChart.update();
+}
+</script>
+<button onclick="ordenarMotoristasPorDistancia()">Ordenar Motoristas por Distância</button>
+
+
+<div style="border: 0px solid red; height: 5px;"></div>
+
+
+<!-- Botões para fazer "zoom" reduzindo o horizonte de dias exibido no painel -->
+
+<script>
+
+
+	function ajustarTicksPorZoom(horizonteDias) {
+	  let stepSize;
+
+	  if (horizonteDias > 14) stepSize = 24;    // Mais de 14 dias → 1 tick a cada 24h
+	  else if (horizonteDias > 7) stepSize = 24; // 7-14 dias → 1 tick a cada 12h
+	  else if (horizonteDias > 3) stepSize = 24;  // 3-7 dias → 1 tick a cada 6h
+	  else if (horizonteDias > 1) stepSize = 24;  // 1-3 dias → 1 tick a cada 3h
+	  else stepSize = 1;                         // Menor que 1 dia → 1 tick a cada 1h
+
+	  myChart.options.scales.x.time.unit = 'hour';
+	  myChart.options.scales.x.time.stepSize = stepSize;
+
+	  myChart.update();
+	}
+
+	// Função para alterar o horizonte de tempo no eixo x com "now" no centro
+	function alterarHorizonteTempo(dias) {
+	  // Data central (o "now" configurado no gráfico)
+	  const agora = new Date('2024-09-19T10:00:00'); // Aqui pode ser a data real dinâmica
+
+	  // Calcula os limites do horizonte baseado no número de dias
+	  const dataInicio = new Date(agora);
+	  dataInicio.setDate(agora.getDate() - Math.floor((dias+1) / 2)); // Metade do período para trás
+
+	  const dataFim = new Date(agora);
+	  dataFim.setDate(agora.getDate() + Math.ceil((dias-1) / 2)); // Metade do período para frente
+
+	  // Atualizar as escalas no gráfico
+	  myChart.options.scales.x.min = dataInicio; // Novo início (min)
+	  myChart.options.scales.x.max = dataFim;    // Novo fim (max)
+
+	  // Atualizar o gráfico com os novos limites
+	  myChart.update();
+	  //ajustarTicksPorZoom(dias); // Descomente se necessário para ajustar ticks dinamicamente
+	}
+
+</script>
+
+Mudar dias no horizonte do painel:
+
+<!-- Botões para alternar o horizonte de tempo -->
+<button onclick="alterarHorizonteTempo(1)">Horizonte de 1 Dia</button>
+<button onclick="alterarHorizonteTempo(3)">Horizonte de 3 Dias</button>
+<button onclick="alterarHorizonteTempo(7)">Horizonte de 7 Dias</button>
+<button onclick="alterarHorizonteTempo(14)">Horizonte de 14 Dias</button>
+<button onclick="alterarHorizonteTempo(30)">Horizonte de 30 Dias</button>
+
+
+</body>
+</html>
+
