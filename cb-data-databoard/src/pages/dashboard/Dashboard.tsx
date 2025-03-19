@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { Box } from "@mui/material";
 import DataRibbon from "@/components/Dashboard/DataRibbon";
@@ -8,13 +9,13 @@ import { Grid2 } from "@mui/material";
 const Dashboard = () => {
   return (
     <Box>
-      <Grid2>
+      {/* <Grid2>
         <DataRibbon />
-      </Grid2>
+      </Grid2> */}
       <Grid2 marginTop={4}>
         <TransactionsPerDay />
       </Grid2>
-      <TransactionBottomRow />
+      {/* <TransactionBottomRow /> */}
     </Box>
   );
 };
